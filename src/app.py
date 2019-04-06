@@ -4,7 +4,6 @@ from decimal import Decimal
 import json
 import urllib
 import uuid
-import datetime
 import time
 import os
 
@@ -19,10 +18,6 @@ outputBucket = os.environ['OUTPUT_BUCKET']
 
 # --------------- Main handler ------------------
 def lambda_handler(event, context):
-    '''
-    Uses Rekognition APIs to detect text and labels for objects uploaded to S3
-    and store the content in DynamoDB.
-    '''
     # Log the the received event locally.
     print("Received event: " + json.dumps(event, indent=2))
 
@@ -32,8 +27,6 @@ def lambda_handler(event, context):
 
     # Log the buckets and key
     print("Input Bucket: " + bucket + " Key: " + key)
-
-    
     print("Output Bucket: " + outputBucket)
 
     try:
@@ -58,12 +51,11 @@ def lambda_handler(event, context):
         # Log converted number of records
         print("Converted %i records into qual" % count)
 
-
         # upload FASTA file to the output bucket
-        s3.upload_file(localoutfile, outputBucket,  localoutfile.split('/')[2])
+        s3.upload_file(localoutfile, outputBucket, localoutfile.split('/')[2])
 
         # upload QUAL file to the output bucket
-        s3.upload_file(localoutqualfile, outputBucket,  localoutqualfile.split('/')[2])
+        s3.upload_file(localoutqualfile, outputBucket, localoutqualfile.split('/')[2])
 
         return 'Success'
     except Exception as e:
