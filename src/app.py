@@ -13,10 +13,9 @@ sys.path.insert(0, './package')
 from Bio import SeqIO
 
 s3 = boto3.client('s3')
-dynamo_client = boto3.client('dynamodb')
 
-# Get the table name from the Lambda Environment Variable
-table_name = os.environ['TABLE_NAME']
+# Get the output S3 Bucket from the Lambda Environment Variable
+outputBucket = os.environ['OUTPUT_BUCKET']
 
 # --------------- Main handler ------------------
 def lambda_handler(event, context):
@@ -31,10 +30,11 @@ def lambda_handler(event, context):
     bucket = event['Records'][0]['s3']['bucket']['name']
     key = urllib.parse.unquote_plus(event['Records'][0]['s3']['object']['key'])
 
-    # Log the bucket and key
+    # Log the buckets and key
     print("Input Bucket: " + bucket + " Key: " + key)
 
-    outputBucket = 'iaqportal'
+    
+    print("Output Bucket: " + outputBucket)
 
     try:
         # download the FASTQ file to a local file
@@ -64,20 +64,6 @@ def lambda_handler(event, context):
 
         # upload QUAL file to the output bucket
         s3.upload_file(localoutqualfile, outputBucket,  localoutqualfile.split('/')[2])
-
-        #textDetections = [text['DetectedText'] for text in response['TextDetections']]
-        textDetections = "divertiamoci con il textDetections"
-        #labels = [{label_prediction['Name']: Decimal(str(label_prediction['Confidence']))} for label_prediction in response['Labels']]
-        labels = "ora con le labels"
-
-        # Get the timestamp.
-        ts = time.time()
-        timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-
-        # Write to DynamoDB.
-        table = boto3.resource('dynamodb').Table(table_name)
-        item={'id':key, 'DateTime':timestamp, 'Labels':labels, 'Text':textDetections}
-        #table.put_item(Item=item)
 
         return 'Success'
     except Exception as e:

@@ -1,16 +1,16 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: fastq2fasta - SAM app that converts a FASTQ S3 Objects into FASTA and
-  QUAL files (and stores labels in DynamoDB).
+Description: fastq2fasta - SAM app that converts a FASTQ S3 file objects into FASTA
+  and QUAL files.
 Resources:
   ConvertFastq2Fasta:
     Properties:
-      CodeUri: s3://iaqportal/976afacfccf8b25c90ff54b9f42a9cad
-      Description: converts a FASTQ S3 Objects into FASTA and QUAL files and stores
-        the new files in the output bucket.
+      CodeUri: s3://iaqportal/878d1cb7afaabb71f3e2acdb5a3b808a
+      Description: converts a FASTQ S3 file objects into FASTA and QUAL files and
+        stores the new files in the output bucket.
       Environment:
         Variables:
-          TABLE_NAME:
-            Ref: ResultsTable
+          OUTPUT_BUCKET:
+            Ref: OutputBucket
       Events:
         BucketEvent1:
           Properties:
@@ -29,27 +29,12 @@ Resources:
           - s3:PutObject
           Effect: Allow
           Resource: arn:aws:s3:::*
-        - Action:
-          - dynamodb:GetItem
-          - dynamodb:PutItem
-          - dynamodb:Scan
-          - dynamodb:UpdateItem
-          Effect: Allow
-          Resource:
-            Fn::Join:
-            - ''
-            - - 'arn:aws:dynamodb:'
-              - Ref: AWS::Region
-              - ':'
-              - Ref: AWS::AccountId
-              - :table/
-              - Ref: ResultsTable
         Version: '2012-10-17'
       Runtime: python3.6
       Timeout: 30
     Type: AWS::Serverless::Function
-  ResultsTable:
-    Type: AWS::Serverless::SimpleTable
+  OutputBucket:
+    Type: AWS::S3::Bucket
   SourceFastqBucket:
     Type: AWS::S3::Bucket
 Transform: AWS::Serverless-2016-10-31
