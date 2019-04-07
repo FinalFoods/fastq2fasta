@@ -1,45 +1,48 @@
-
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
-
 Description: fastq2fasta - SAM app that converts a FASTQ S3 file objects into FASTA and QUAL files.
 
 Resources:
-  ConvertFastq2Fasta:
-    Type: 'AWS::Serverless::Function'
+  transform:
+    Type: AWS::Serverless::Function
     Properties:
+
+      Description: converts a FASTQ S3 file objects into FASTA and QUAL files and stores the new files in the output bucket.
       Handler: src/app.lambda_handler
       Runtime: python3.6
       CodeUri: .
-      Description: converts a FASTQ S3 file objects into FASTA and QUAL files and stores the new files in the output bucket.
       MemorySize: 512
       Timeout: 30
+
+      Policies:
+        - S3ReadPolicy:
+            BucketName:
+              Ref: SourceFastqBucket
+        - S3CrudPolicy:
+            BucketName:
+              Ref: OutputBucket
+      Events:
+        upload:
+          Type: S3
+          Properties:
+            Bucket:
+              Ref: source
+            Events: s3:ObjectCreated:*
       Environment:
         Variables:
           OUTPUT_BUCKET:
             Ref: OutputBucket
-      Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - 's3:GetObject'
-                - 's3:GetObjectAcl'
-                - 's3:PutObject'
-              Resource: 'arn:aws:s3:::*'
 
-      Events:
-        BucketEvent1:
-          Type: S3
-          Properties:
-            Bucket:
-              Ref: SourceFastqBucket
-            Events:
-              - 's3:ObjectCreated:*'
-  
+  source:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Ref: SourceFastqBucket
+
+Parameters:
   SourceFastqBucket:
-    Type: 'AWS::S3::Bucket'
-
+    Type: String
+    Description: Name of the S3 Bucket to read FASTQ files from (must NOT exist prior to deployment)
   OutputBucket:
-    Type: 'AWS::S3::Bucket'
-
+    Type: String
+    Description: Name of the S3 Bucket to put FASTA and QUAL files into (must exist prior to deployment)

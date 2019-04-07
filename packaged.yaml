@@ -1,10 +1,24 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: fastq2fasta - SAM app that converts a FASTQ S3 file objects into FASTA
   and QUAL files.
+Parameters:
+  OutputBucket:
+    Description: Name of the S3 Bucket to put FASTA and QUAL files into (must exist
+      prior to deployment)
+    Type: String
+  SourceFastqBucket:
+    Description: Name of the S3 Bucket to read FASTQ files from (must NOT exist prior
+      to deployment)
+    Type: String
 Resources:
-  ConvertFastq2Fasta:
+  source:
     Properties:
-      CodeUri: s3://iaqportal/c9700516ddc4b4b5f90819fedd9b203d
+      BucketName:
+        Ref: SourceFastqBucket
+    Type: AWS::S3::Bucket
+  transform:
+    Properties:
+      CodeUri: s3://iaqportal/4c4a7bd0c5e89470c128e032a875f061
       Description: converts a FASTQ S3 file objects into FASTA and QUAL files and
         stores the new files in the output bucket.
       Environment:
@@ -12,29 +26,22 @@ Resources:
           OUTPUT_BUCKET:
             Ref: OutputBucket
       Events:
-        BucketEvent1:
+        upload:
           Properties:
             Bucket:
-              Ref: SourceFastqBucket
-            Events:
-            - s3:ObjectCreated:*
+              Ref: source
+            Events: s3:ObjectCreated:*
           Type: S3
       Handler: src/app.lambda_handler
       MemorySize: 512
       Policies:
-      - Statement:
-        - Action:
-          - s3:GetObject
-          - s3:GetObjectAcl
-          - s3:PutObject
-          Effect: Allow
-          Resource: arn:aws:s3:::*
-        Version: '2012-10-17'
+      - S3ReadPolicy:
+          BucketName:
+            Ref: SourceFastqBucket
+      - S3CrudPolicy:
+          BucketName:
+            Ref: OutputBucket
       Runtime: python3.6
       Timeout: 30
     Type: AWS::Serverless::Function
-  OutputBucket:
-    Type: AWS::S3::Bucket
-  SourceFastqBucket:
-    Type: AWS::S3::Bucket
 Transform: AWS::Serverless-2016-10-31
