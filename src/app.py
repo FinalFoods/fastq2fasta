@@ -8,7 +8,9 @@ import time
 import os
 
 import sys
-sys.path.insert(0, './package')
+# Add to path so that Layers can be imported
+sys.path.insert(0, '/opt')
+#sys.path.insert(0, './package')
 from Bio import SeqIO
 
 s3 = boto3.client('s3')

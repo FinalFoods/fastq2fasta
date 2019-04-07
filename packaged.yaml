@@ -11,14 +11,9 @@ Parameters:
       to deployment)
     Type: String
 Resources:
-  source:
+  FastqConvertFunction:
     Properties:
-      BucketName:
-        Ref: SourceFastqBucket
-    Type: AWS::S3::Bucket
-  transform:
-    Properties:
-      CodeUri: s3://iaqportal/4c4a7bd0c5e89470c128e032a875f061
+      CodeUri: s3://iaqportal/79a1a0a33571774dda8ec763ba9c2584
       Description: converts a FASTQ S3 file objects into FASTA and QUAL files and
         stores the new files in the output bucket.
       Environment:
@@ -29,10 +24,12 @@ Resources:
         upload:
           Properties:
             Bucket:
-              Ref: source
+              Ref: SourceBucket
             Events: s3:ObjectCreated:*
           Type: S3
       Handler: src/app.lambda_handler
+      Layers:
+      - arn:aws:lambda:us-west-1:892335585962:layer:biopython:1
       MemorySize: 512
       Policies:
       - S3ReadPolicy:
@@ -44,4 +41,9 @@ Resources:
       Runtime: python3.6
       Timeout: 30
     Type: AWS::Serverless::Function
+  SourceBucket:
+    Properties:
+      BucketName:
+        Ref: SourceFastqBucket
+    Type: AWS::S3::Bucket
 Transform: AWS::Serverless-2016-10-31

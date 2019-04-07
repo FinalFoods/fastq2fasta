@@ -2,8 +2,16 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: fastq2fasta - SAM app that converts a FASTQ S3 file objects into FASTA and QUAL files.
 
+Parameters:
+  SourceFastqBucket:
+    Type: String
+    Description: Name of the S3 Bucket to read FASTQ files from (must NOT exist prior to deployment)
+  OutputBucket:
+    Type: String
+    Description: Name of the S3 Bucket to put FASTA and QUAL files into (must exist prior to deployment)
+
 Resources:
-  transform:
+  FastqConvertFunction:
     Type: AWS::Serverless::Function
     Properties:
 
@@ -26,23 +34,26 @@ Resources:
           Type: S3
           Properties:
             Bucket:
-              Ref: source
+              Ref: SourceBucket
             Events: s3:ObjectCreated:*
       Environment:
         Variables:
           OUTPUT_BUCKET:
             Ref: OutputBucket
+      Layers: 
+        - arn:aws:lambda:us-west-1:892335585962:layer:biopython:1
+#        - arn:aws:lambda:us-west-1:892335585962:layer:sam-app-dependencies:2
+#        - !Ref BiopythonLibrary            
 
-  source:
+#  BiopythonLibrary:
+#    Type: 'AWS::Serverless::LayerVersion'
+#    Properties:
+#     ContentUri: ./layer/
+#      CompatibleRuntimes:
+#        - python3.6
+
+  SourceBucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName:
         Ref: SourceFastqBucket
-
-Parameters:
-  SourceFastqBucket:
-    Type: String
-    Description: Name of the S3 Bucket to read FASTQ files from (must NOT exist prior to deployment)
-  OutputBucket:
-    Type: String
-    Description: Name of the S3 Bucket to put FASTA and QUAL files into (must exist prior to deployment)
