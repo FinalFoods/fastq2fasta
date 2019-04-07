@@ -23,8 +23,8 @@
                     "ownerIdentity": {
                         "principalId": "EXAMPLE"
                     }, 
-                    "name": "fastq2fasta-sourcefastqbucket-1t4zx5uj2ps1i", 
-                    "arn": "arn:aws:s3:::fastq2fasta-sourcefastqbucket-1t4zx5uj2ps1i"
+                    "name": "iaq-fastq2fasta", 
+                    "arn": "arn:aws:s3:::iaq-fastq2fasta"
                 }, 
                 "s3SchemaVersion": "1.0"
             }, 
