@@ -4,7 +4,7 @@ Description: fastq2fasta - SAM app that converts a FASTQ S3 file objects into FA
 Resources:
   ConvertFastq2Fasta:
     Properties:
-      CodeUri: s3://iaqportal/878d1cb7afaabb71f3e2acdb5a3b808a
+      CodeUri: s3://iaqportal/c9700516ddc4b4b5f90819fedd9b203d
       Description: converts a FASTQ S3 file objects into FASTA and QUAL files and
         stores the new files in the output bucket.
       Environment:
