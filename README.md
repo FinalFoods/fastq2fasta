@@ -6,14 +6,14 @@ SAM application that converts a FASTQ S3 file objects into FASTA and QUAL files.
 .
 ├── README.md                   <-- This README
 ├── SampleEvent.json            <-- Event payload for local testing
-├── src                         <-- Source code for a lambda function
+├── src                         <-- Lambda function source code 
 │   ├── __init__.py
 │   ├── app.py                  <-- Lambda function code
-│   ├── requirements.txt        <-- Lambda function code
+│   ├── requirements.txt        <-- Python dependencies
 ├── template.yaml               <-- SAM Template
 ├── requirements.txt             
-├── dependencies.zip            <-- Lambda layer package              
-└── layer                       <-- Lambda layer
+├── dependencies.zip            <-- Layer package              
+└── layer                       <-- Lambda Layer
     └── __init__.py             
     ├── Bio                      <-- BioPython library            
     ├── BioSQL   
@@ -27,20 +27,6 @@ SAM application that converts a FASTQ S3 file objects into FASTA and QUAL files.
 * [Docker installed](https://www.docker.com/community-edition)
 
 ## Setup process
-
-### Local development
-
-**Invoking function locally using a local sample payload**
-
-```bash
-sam local invoke HelloWorldFunction --event event.json
-```
-
-**Invoking function locally through local API Gateway**
-
-```bash
-sam local start-api
-```
 
 ## Building the project
 
@@ -138,7 +124,7 @@ $ OUTPUT_BUCKET=iaqportal sam local invoke \
     --event SampleEvent.json \
     --region us-west-1
 ```
->The `OUTPUT_BUCKET` environmental variable indicates an existing temporary output S3 bucket. A FASTQ file must be uploaded to the source bucket `iaq-fastq2fasta` before invoking the function locally.
+>**The `OUTPUT_BUCKET` environmental variable indicates an existing temporary output S3 bucket. A FASTQ file must be uploaded to the source bucket `iaq-fastq2fasta` before invoking the function locally.**
 
 ### Package Lambda function defined locally and upload to S3 as an artifact
 ```bash
@@ -160,7 +146,7 @@ sam deploy \
 > **The SourceFastqBucket will be created by the deployment but the OutputBucket must exist before**
 
 ### Tail Lambda function logs
-Tail Lambda function Logs using Logical name defined in SAM Template:
+Tail Lambda function Logs using the Logical name defined in SAM Template:
 ```bash
 sam logs -n FastqConvertFunction --stack-name fastq2fasta-2-2 --tail --region us-west-1
 ```
